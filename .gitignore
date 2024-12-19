@@ -169,4 +169,5 @@ secrets.toml
 #virtual environment
 webai/
 
-
+# Whoosh stuff
+indexdir
