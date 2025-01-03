@@ -5,9 +5,9 @@
     </head>
     <body>
         <h1>Search results:</h1>
-
-        {% for result in search_results %}
-            <p>{{ result }}</p>
+        {% for result, title in search_results %}
+            <span>{{ title }}: </span><br>
+            <a href="{{ result }}">{{ result }}</a><br><br>
         {% endfor %}
     </body>
 </html>
