@@ -9,8 +9,8 @@ from whoosh.qparser import QueryParser
 
 ### Build index ###
 
-# Store attributes in schema which can later be retrieved from index
-schema = Schema(url=ID(stored=True), content=TEXT(stored=True))
+# Store attributes in schema which can later be retrieved and displayed from index
+schema = Schema(url=ID(stored=True), title=TEXT(stored=True), content=TEXT(stored=True))
 
 # Create index directory "indexdir" if not existing yet
 if not os.path.exists("indexdir"):
@@ -42,11 +42,12 @@ def crawl(start_url):
             if r.status_code == 200 and 'text/html' in r.headers.get('Content-Type', ''):
                 soup = BeautifulSoup(r.content, 'html.parser')
                 
-                # Index the page content using Whoosh
+                # Index the page content and title using Whoosh
                 text = soup.get_text().lower()
-
+                title = soup.find("title").text
+                
                 writer = indx.writer()  # index writer, allowing to add documents to index
-                writer.add_document(url=url, content=text) # map field names to URL and content of crawled website
+                writer.add_document(url=url, content=text, title=title) # map field names to URL, content, and title of crawled website
                 writer.commit() # save added document to index
 
                 # for word in set(text):  # Using set to avoid duplicates
@@ -77,9 +78,10 @@ def search(query_words):
         results = searcher.search(query)
 
         # Create list of URLs from each document, which contains the searched words
-        results = [hit['url'] for hit in results]
+        search_results = [(hit['url'], hit['title']) for hit in results]
+        print("tuple: ", search_results)
     
-    return results
+    return search_results
 
     # if not words:
     #     return []
@@ -115,5 +117,6 @@ if __name__ == "__main__":
 
     # Print all results
     print(f"\nPages containing your search query \'{test_query}\':")
-    for url in results:
+    for url, title in results:
+       print(f"- {title}")
        print(f"- {url}")
