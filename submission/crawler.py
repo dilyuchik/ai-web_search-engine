@@ -70,16 +70,31 @@ def crawl(start_url):
 
 
 def search(query_words):
-    """Search for pages containing all query words using Whoosh"""
+    """
+    Search for pages containing all query words using Whoosh, and extracts the title of the matching pages as well as the snippets within these pages containing the search query
+    """
 
     with indx.searcher() as searcher:
         # Parse query, searching in the "content" field while converting all user input to lowercase
         query = QueryParser("content", indx.schema).parse(query_words.lower())
         results = searcher.search(query)
 
-        # Create list of URLs from each document, which contains the searched words
-        search_results = [(hit['url'], hit['title']) for hit in results]
-        print("tuple: ", search_results)
+        # Create empty list store the URLs from each document, which contains the searched words as well as the 
+        # pages' title and snippets containing the searched words
+        search_results = []
+        for hit in results:
+            title = hit['title']
+            url = hit['url']
+            snippet = hit.highlights('content')
+
+            search_results.append({
+                    'title': title,
+                    'url': url,
+                    'snippet': snippet
+                })
+
+        #search_results = [(hit['url'], hit['title']) for hit in results]
+        #print("tuple: ", search_results)
     
     return search_results
 
@@ -98,6 +113,12 @@ def search(query_words):
     
     #return list(result_urls)
 
+def corrector(query_words):
+    with indx.searcher() as searcher:
+        corrector = QueryParser("content", indx.schema).parse(query_words.lower())
+        corrected = searcher.correct_query(corrector, query_words)
+
+    return corrected.string
 
 # Test the crawler
 if __name__ == "__main__":
@@ -112,11 +133,12 @@ if __name__ == "__main__":
     #print(f"Words indexed: {len(indx)}")
     
     # Test search
-    test_query = "welcome page"
+    test_query = "platypus"
     results = search(test_query)
 
     # Print all results
     print(f"\nPages containing your search query \'{test_query}\':")
-    for url, title in results:
-       print(f"- {title}")
-       print(f"- {url}")
+    #for url, title in results:
+    #   print(f"- {title}")
+    #   print(f"- {url}")
+    print(corrector("welcome pag"))
