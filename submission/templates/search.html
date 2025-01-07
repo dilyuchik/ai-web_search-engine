@@ -5,9 +5,16 @@
     </head>
     <body>
         <h1>Search results:</h1>
+        {% if search_results %}
+            {% for result in search_results %}
+                <span>{{ result.title }}: </span><br>
+                <a href="{{ result.url }}">{{ result.url }}</a><br>
+                <span>{{ result.snippet | safe }}</span><br><br>
+            {% endfor %}
+        {% else %}
+            <p>No matches found. Please try searching for something different.</p>
+        {% endif %}
 
-        {% for result in search_results %}
-            <p>{{ result }}</p>
-        {% endfor %}
+        <a href="/"><button>New Search</button></a>        
     </body>
 </html>
