@@ -9,7 +9,7 @@
     <!-- Include Font Awesome for microphone icon -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Favicon for the page -->
-    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         /* General body styles for layout, font, and alignment */
         body {
@@ -111,7 +111,7 @@
 <body>
     <div class="container">
         <!-- Display the logo -->
-        <img src="ai-web_search-engine/static/logo.png" alt="Logo" class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
         <!-- Search bar with text input and buttons -->
         <form action="search" method="get" class="search-bar">
             <input name="query" type="text" placeholder="Search for something...">
