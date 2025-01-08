@@ -180,10 +180,15 @@
 </head>
 <body>
     <div class="header">
-        <!-- Logo with a link back to the homepage -->
-        <a href="/" class="logo-link">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <a href="javascript:void(0);" class="logo-link" onclick="goBack()">
+            <img src="static/logo.png" alt="Logo" class="logo">
         </a>
+        
+        <script>
+          function goBack() {
+            window.history.back();  // Kullanıcıyı önceki sayfaya yönlendirir
+          }
+        </script>
         
         <!-- Search bar form -->
         <form action="search" method="get" class="search-bar">
@@ -227,8 +232,9 @@
 
         <!-- Button to start a new search -->
         <div class="new-search">
-            <a href="/home"><button>New Search</button></a>
+            <a href="javascript:window.history.back();"><button>New Search</button></a>
         </div>
+
     </div>
 </body>
 </html>
