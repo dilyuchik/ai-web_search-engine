@@ -15,6 +15,10 @@ def initialize_crawler():
 # Call the crawler during application initialization
 initialize_crawler()
 
+@app.route("/")
+def index():
+    return redirect(url_for('home'))
+    
 @app.route("/home")
 def home():
     # Render the homepage template
