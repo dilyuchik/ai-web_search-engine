@@ -1,43 +1,59 @@
--- STEP BY STEP GUIDE FOR TASK 2 --
-=============================
+# WebCrawler Application  
 
-Build a search engine with all four components:
-- Crawler
-- Index
-- Query parser and search algorithm
-- User Frontend
+A simple web crawler application with a user-friendly interface for searching the web. This project is powered by Flask and features speech recognition to facilitate search queries.  
+![Home Page](static/Screenshot-1.png)
+![Search Results Page](static/Screenshot-2.png)
+---
 
-Demonstrate it by crawling one website and making its content available to the user via a web frontend with a simple search form. 
-Make the result available on the provided demo server.
-Submit the code and the link to the demo deployment.
+## Features  
+- **Search Functionality**: Enter queries in the search bar to find relevant information.  
+- **Speech Recognition**: Click the microphone icon to input search queries using voice commands.  
+- **Word Correction:** Automatically suggests corrections for misspelled words in search queries.
+  
 
- 
-Suggested order of building:
+---
 
-Week 1 of project:
-1 Create a working environment on your computers
-2 Create a repository (Gitlab, Github, …) for your project 2 and make sure all group members can access it
-3 Start with adding a .gitignore and a requirements.txt file to the repository (requirements are requests and beautifulsoup4)
-4 Create a `crawler.py` file and define the skeleton of the crawling algorithm: 
-    4.1 Crawl (=get and parse) all HTML pages on a certain server 
-    4.2 that can directly or indirectly be reached from a start URL 
-    4.3 by following links on the pages. 
-    4.4 Do not follow links to URLs on other servers and only process HTML responses. 
-    4.5 Test the crawler with a simple website, e.g., https://vm009.rz.uos.de/crawl/index.html 
-5 Build an in-memory index from the HTML text content found. 
-    5.1 The most straightforward index is a dictionary with words as keys and lists of URLs that refer to pages     that include the word.
-6 Add a function 'search' that takes a list of words as a parameter and returns (by using the index) a list of links to all pages that contain all the words from the list. 
-7 Test the functionality.
+## Files Overview  
+- `static/logo.png`: Logo displayed at the top of the web page.  
+- `static/favicon.ico`: Favicon for the browser tab.  
+- `search_engine.py`: The main Flask application file.  
+- `templates/home.html`: The HTML template for the application's home page.  
+- `templates/search.html`: The HTML template for the search results page.  
+- `crawler.py`: A script for the crawling logic to fetch web data.  
+- `requirements.txt`: Contains Python dependencies for the project.  
 
-Don't worry if you don't get that far! Use the element chat and the Friday session to ask questions, report problems and tell about hurdles and obstacles!
+---
 
-Week 2:
-1 Replace the simple index with code using the woosh library (will be introduced in week 6 - https://whoosh.readthedocs.io/en/latest/intro.html ).
-2 Build a flask app (will be introduced in week 6) with two URLs that show the following behavior:
-    2.1 GET home URL: Show search form
-    2.2 GET search URL with parameter q: Search for q using the index and display a list of URLs as links
+## Prerequisites  
+Ensure you have the following installed:  
+- Python 3.7 or higher  
+- pip (Python package manager)  
 
-Week 3:
-1 Improve the index by adding information (ideas will be presented in week 7)
-2 Improve the output by including title and teaser text
-3 Install your search engine on the demo server provided (will be introduced in week 7)
+---
+
+## How to Run the Application  
+
+1. **Clone the Repository**:
+   git clone https://github.com/dilyuchik/ai-web_search-engine.git
+   cd ai-web_search-engine
+
+2. **Set Up a Virtual Environment (Optional but Recommended)**:
+   python3 -m venv venv
+   source venv/bin/activate   # On Windows: venv\Scripts\activate
+
+
+3. **Install Dependencies**:
+   pip install -r requirements.txt
+
+4. **Run the Flask App**:
+   cd submission
+   flask --app=search_engine.py run
+   
+   The application will be accessible at `http://127.0.0.1:5000/`.
+
+5. **Testing the Application**:
+   - Open a browser and go to `http://127.0.0.1:5000/`.
+   - Use the search bar or speech recognition to test the features.
+
+6. **Stopping the Application**:
+   Press `Ctrl+C` in the terminal to stop the server.
