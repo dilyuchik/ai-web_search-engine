@@ -1,20 +1,234 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>SearchEngineApp</title>
-    </head>
-    <body>
-        <h1>Search results:</h1>
-        {% if search_results %}
-            {% for result in search_results %}
-                <span>{{ result.title }}: </span><br>
-                <a href="{{ result.url }}">{{ result.url }}</a><br>
-                <span>{{ result.snippet | safe }}</span><br><br>
-            {% endfor %}
-        {% else %}
-            <p>No matches found. Please try searching for something different.</p>
+<html lang="en">
+<head>
+    <!-- Specifies document type and language -->
+    <meta charset="UTF-8"> <!-- Defines the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes the page responsive -->
+    <title>Search Results</title> <!-- Title displayed in the browser tab -->
+
+    <!-- Link to Roboto font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* General body styles for spacing, typography, and background */
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif; /* Sets the font to Roboto */
+            background-color: #f9f9f9; /* Light grey background for a clean look */
+            color: #333; /* Dark grey text for readability */
+            padding-top: 160px; /* Space between the fixed header and the main content */
+        }
+
+        /* Container for main content with centered layout */
+        .container {
+            width: 90%; /* Responsive width */
+            max-width: 800px; /* Limits container width */
+            text-align: left; /* Aligns text to the left */
+            margin: 20px auto; /* Centers the container horizontally */
+        }
+
+        /* Styles for the fixed header */
+        .header {
+            position: fixed; /* Stays at the top even when scrolling */
+            top: 0;
+            left: 0;
+            width: 100%; /* Spans the full width */
+            background-color: #fff; /* White background for contrast */
+            display: flex; /* Flexbox for alignment */
+            align-items: center; /* Vertically centers content */
+            padding: 10px 20px; /* Padding around content */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for a floating effect */
+            z-index: 1000; /* Ensures the header is above other elements */
+            justify-content: center; /* Centers content horizontally */
+        }
+
+        /* Styles for the logo inside the header */
+        .logo {
+            width: 120px; /* Sets logo width */
+            display: flex; /* Flex container for consistency */
+        }
+
+        /* Styles for the search bar inside the header */
+        .search-bar {
+            display: flex; /* Flexbox layout for alignment */
+            justify-content: center; /* Centers the search bar */
+            align-items: center; /* Vertically centers content */
+            margin-left: 20px; /* Spacing from the logo */
+            width: 100%;
+            max-width: 500px; /* Limits search bar width */
+        }
+
+        /* Input field styles */
+        input[type="text"] {
+            width: 100%; /* Full width of the parent */
+            padding: 15px; /* Inner spacing for usability */
+            border: 1px solid #ddd; /* Light grey border */
+            border-radius: 25px 0 0 25px; /* Rounded corners on the left */
+            outline: none; /* Removes default outline */
+            font-size: 16px; /* Readable font size */
+            transition: box-shadow 0.3s ease-in-out; /* Smooth focus transition */
+        }
+
+        /* Focus state for the input field */
+        input[type="text"]:focus {
+            box-shadow: 0 0 8px #71b3fa80; /* Subtle blue shadow */
+            border-color: #0f2d4e; /* Dark blue border */
+        }
+
+        /* Styles for the search button */
+        button {
+            background-color: #0f2d4e; /* Dark blue background */
+            color: #fff; /* White text for contrast */
+            border: none; /* Removes default border */
+            padding: 15px 20px; /* Inner spacing */
+            border-radius: 0 25px 25px 0; /* Rounded corners on the right */
+            font-size: 16px; /* Readable font size */
+            cursor: pointer; /* Pointer cursor for interaction */
+            transition: background-color 0.3s ease; /* Smooth hover transition */
+        }
+
+        /* Hover state for the search button */
+        button:hover {
+            background-color: #124173; /* Slightly darker blue */
+        }
+
+        /* Main heading styles */
+        h1 {
+            text-align: center; /* Centers the heading */
+            font-size: 24px; /* Large font size */
+            margin-bottom: 20px; /* Spacing below the heading */
+            color: #444; /* Slightly lighter grey than body text */
+        }
+
+        /* Styles for individual search results */
+        .result {
+            background-color: #fff; /* White background */
+            border: 1px solid #ddd; /* Light grey border */
+            border-radius: 8px; /* Rounded corners */
+            padding: 20px; /* Inner spacing */
+            margin-bottom: 15px; /* Spacing between results */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+
+        /* Hover state for search results */
+        .result:hover {
+            transform: translateY(-3px); /* Slight upward lift */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow */
+        }
+
+        /* Styles for result links */
+        .result a {
+            text-decoration: none; /* Removes underline */
+            color: #124173; /* Dark blue text */
+            font-weight: 500; /* Medium font weight */
+            display: block; /* Ensures clickable area */
+            margin-top: 10px; /* Spacing above link */
+        }
+
+        /* Hover state for result links */
+        .result a:hover {
+            text-decoration: underline; /* Adds underline on hover */
+        }
+
+        /* Styles for result snippet */
+        .snippet {
+            color: #666; /* Medium grey text */
+            font-size: 14px; /* Smaller font size */
+            margin-top: 5px; /* Spacing above snippet */
+        }
+
+        /* Styles for the "no results" message */
+        .no-results {
+            text-align: center; /* Centers the text */
+            font-size: 18px; /* Slightly larger font */
+            color: #777; /* Light grey text */
+            margin-top: 30px; /* Spacing above the message */
+        }
+
+        /* Styles for the new search button container */
+        .new-search {
+            display: flex; /* Flex container */
+            justify-content: center; /* Centers the button */
+            margin-top: 30px; /* Spacing above */
+        }
+
+        /* Styles for the new search button */
+        .new-search button {
+            background-color: #0f2d4e; /* Dark blue background */
+            color: #fff; /* White text */
+            border: none; /* Removes default border */
+            padding: 10px 20px; /* Inner spacing */
+            border-radius: 25px; /* Fully rounded corners */
+            font-size: 16px; /* Readable font size */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease; /* Smooth hover transition */
+        }
+
+        /* Hover state for the new search button */
+        .new-search button:hover {
+            background-color: #124173; /* Slightly darker blue */
+        }
+
+        /* Correction message styles */
+        .correction-message {
+            font-size: 16px; /* Font size for correction message */
+            text-align: center; /* Centers the text */
+            margin: 20px 0; /* Vertical spacing */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- Logo with a link back to the homepage -->
+        <a href="/" class="logo-link">
+            <img src="/static/logo.png" alt="Logo" class="logo"> <!-- Logo image -->
+        </a>
+        
+        <!-- Search bar form -->
+        <form action="search" method="get" class="search-bar">
+            <input name="query" type="text" placeholder="Search for something..." value="{{ request.args.get('query', '') }}">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h1>Search Results</h1> <!-- Page heading -->
+
+        <!-- Displays a correction message if the query was corrected -->
+        {% if is_corrected %}
+            <div class="correction-message">
+                <span style="color: #333333;">You typed </span>
+                <span style="font-weight: bold; text-decoration: underline; color: darkred;">{{ original_query }}</span>, 
+                but did you mean 
+                <span style="font-weight: bold; color: darkgreen;">{{ corrected_query }}</span>? 
+                We are displaying results for 
+                <span style="color: #333333;">"{{ corrected_query }}"</span>.
+            </div>
         {% endif %}
 
-        <a href="/"><button>New Search</button></a>        
-    </body>
+        <!-- Loops through search results and displays them -->
+        {% if search_results %}
+            {% for result in search_results %}
+                <a href="{{ result.url }}" class="result-link">
+                    <div class="result">
+                        <span class="title">{{ result.title }}</span><br>
+                        <a href="{{ result.url }}" target="_blank">{{ result.url }}</a><br>
+                        <span class="snippet">{{ result.snippet | safe }}</span>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <!-- Displays a message if no results are found -->
+            <div class="no-results">
+                <p>No matches found. Please try searching for something different.</p>
+            </div>
+        {% endif %}
+
+        <!-- Button to start a new search -->
+        <div class="new-search">
+            <a href="/"><button>New Search</button></a>
+        </div>
+    </div>
+</body>
 </html>
