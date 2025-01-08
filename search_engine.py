@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from crawler import crawl
 from crawler import search as searching
 from spellchecker import SpellChecker  # Import the SpellChecker library
