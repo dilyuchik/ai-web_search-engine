@@ -37,23 +37,24 @@ Ensure you have the following installed:
    git clone https://github.com/dilyuchik/ai-web_search-engine.git
    cd ai-web_search-engine
 
-2. **Set Up a Virtual Environment (Optional but Recommended)**:
+2. **Set Up a Virtual Environment (Optional but recommended)**:
    python3 -m venv venv
    source venv/bin/activate   # On Windows: venv\Scripts\activate
-
 
 3. **Install Dependencies**:
    pip install -r requirements.txt
 
-4. **Run the Flask App**:
-   cd submission
+4. **Run the Crawler (Needs to be run to initialize the index directory if none is present)**:
+   python crawler.py
+
+5. **Run the Flask App**:
    flask --app=search_engine.py run
    
    The application will be accessible at `http://127.0.0.1:5000/`.
 
-5. **Testing the Application**:
+6. **Testing the Application**:
    - Open a browser and go to `http://127.0.0.1:5000/`.
    - Use the search bar or speech recognition to test the features.
 
-6. **Stopping the Application**:
+7. **Stopping the Application**:
    Press `Ctrl+C` in the terminal to stop the server.

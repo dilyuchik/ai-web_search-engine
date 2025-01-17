@@ -1,32 +1,39 @@
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from collections import defaultdict
 import os.path
-from whoosh.index import create_in
+from urllib.parse import urljoin
+
+from bs4 import BeautifulSoup
+import requests
+from whoosh.index import create_in, open_dir
 from whoosh.fields import *
-from whoosh.qparser import QueryParser
 
 ### Build index ###
 
 # Store attributes in schema which can later be retrieved and displayed from index
-schema = Schema(url=ID(stored=True), title=TEXT(stored=True), content=TEXT(stored=True))
+def create_schema():
+    schema = Schema(url=ID(stored=True), title=TEXT(stored=True), content=TEXT(stored=True))
+    return schema
 
 # Create index directory "indexdir" if not existing yet
-if not os.path.exists("indexdir"):
-    os.mkdir("indexdir")
+# Create index directory if it doesn't exist
+def create_index(directory="indexdir"):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    
+    # Create the index in the directory
+    schema = create_schema()
+    indx = create_in(directory, schema)
+    return indx
 
-indx = create_in("indexdir", schema) 
-
-# Initialize already visited, unique websites
-visited = set()
-
-def crawl(start_url):
+def crawl_and_index(start_url, index_dir='indexdir'):
     """
     Function to crawl websites starting from a given URL and staying within the same domain of said URL.
     """
+    indx = open_dir(index_dir)
     agenda = [start_url]
     base_domain = start_url.split('/')[2]  # Get domain from start_url
+
+    # Initialize already visited, unique websites
+    visited = set()
     
     while agenda:
         url = agenda.pop(0)  # Get URL from the start of the list
@@ -49,10 +56,6 @@ def crawl(start_url):
                 writer = indx.writer()  # index writer, allowing to add documents to index
                 writer.add_document(url=url, content=text, title=title) # map field names to URL, content, and title of crawled website
                 writer.commit() # save added document to index
-
-                # for word in set(text):  # Using set to avoid duplicates
-                #     if url not in indx[word]:
-                #         indx[word].append(url)
                 
                 # Find all links and add them to agenda
                 for link in soup.find_all('a'):
@@ -68,77 +71,15 @@ def crawl(start_url):
         except Exception as e:
             print(f"Error processing {url}: {e}")
 
+# Pre-crawl the website  with a specified starting url
+def initialize_crawler(start_url):
+    print("Starting the crawling process...")
+    crawl_and_index(start_url)  # Initiate crawling
+    print("Crawling completed and pages are indexed!")
 
-def search(query_words):
-    """
-    Search for pages containing all query words using Whoosh, and extracts the title of the matching pages as well as the snippets within these pages containing the search query
-    """
 
-    with indx.searcher() as searcher:
-        # Parse query, searching in the "content" field while converting all user input to lowercase
-        query = QueryParser("content", indx.schema).parse(query_words.lower())
-        results = searcher.search(query)
-
-        # Create empty list store the URLs from each document, which contains the searched words as well as the 
-        # pages' title and snippets containing the searched words
-        search_results = []
-        for hit in results:
-            title = hit['title']
-            url = hit['url']
-            snippet = hit.highlights('content')
-
-            search_results.append({
-                    'title': title,
-                    'url': url,
-                    'snippet': snippet
-                })
-
-        #search_results = [(hit['url'], hit['title']) for hit in results]
-        #print("tuple: ", search_results)
-    
-    return search_results
-
-    # if not words:
-    #     return []
-    
-    # # Convert search words to lowercase
-    # words = [w.lower() for w in words]
-
-    # # Get URLs that contain the first word
-    # result_urls = set(index[words[0]])
-    
-    # # Find intersection with URLs for all other words
-    # for word in words[1:]:
-    #     result_urls &= set(index[word])
-    
-    #return list(result_urls)
-
-def corrector(query_words):
-    with indx.searcher() as searcher:
-        corrector = QueryParser("content", indx.schema).parse(query_words.lower())
-        corrected = searcher.correct_query(corrector, query_words)
-
-    return corrected.string
-
-# Test the crawler
+# Initialize the crawler
 if __name__ == "__main__":
-    # Test URL
+    create_index()
     start_url = 'https://vm009.rz.uos.de/crawl/index.html'
-    
-    # Crawl the website
-    crawl(start_url)
-    
-    print("\nCrawling completed!")
-    print(f"Pages crawled: {len(visited)}")
-    #print(f"Words indexed: {len(indx)}")
-    
-    # Test search
-    test_query = "platypus"
-    results = search(test_query)
-
-    # Print all results
-    print(f"\nPages containing your search query \'{test_query}\':")
-    #for url, title in results:
-    #   print(f"- {title}")
-    #   print(f"- {url}")
-    print(corrector("welcome pag"))
+    initialize_crawler(start_url=start_url)

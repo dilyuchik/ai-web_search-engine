@@ -1,19 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for
-from crawler import crawl
-from crawler import search as searching
-from spellchecker import SpellChecker  # Import the SpellChecker library
+from searcher import search as searching
+from spellchecker import SpellChecker
 
 app = Flask(__name__)
-
-# Pre-crawl the website at the startup of the application
-def initialize_crawler():
-    start_url = 'https://vm009.rz.uos.de/crawl/index.html'  # Define the start URL for crawling
-    print("Starting the crawling process...")
-    crawl(start_url)  # Initiate crawling
-    print("Crawling completed and pages are indexed!")
-
-# Call the crawler during application initialization
-initialize_crawler()
 
 @app.route("/")
 def index():
