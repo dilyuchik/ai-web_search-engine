@@ -37,14 +37,14 @@ Ensure you have the following installed:
    git clone https://github.com/dilyuchik/ai-web_search-engine.git
    cd ai-web_search-engine
 
-2. **Set Up a Virtual Environment (Optional but Recommended)**:
+2. **Set Up a Virtual Environment (Optional but recommended)**:
    python3 -m venv venv
    source venv/bin/activate   # On Windows: venv\Scripts\activate
 
 3. **Install Dependencies**:
    pip install -r requirements.txt
 
-4. **Run the Crawler**:
+4. **Run the Crawler (Needs to be run to initialize the index directory if none is present)**:
    python crawler.py
 
 5. **Run the Flask App**:
